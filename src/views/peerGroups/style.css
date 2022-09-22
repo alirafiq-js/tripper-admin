@@ -1,0 +1,16 @@
+.spanStyle{
+   text-transform:capitalize; 
+}
+.span{
+   display: inline-block;
+   margin-left: 5px;
+   font-size: 15px;
+   text-transform: capitalize;
+}
+.labelStyle{
+   font-weight: bold;
+   font-size: 15px;
+}
+.pointerStyle{
+   cursor: pointer;
+}

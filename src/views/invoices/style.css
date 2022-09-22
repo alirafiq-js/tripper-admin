@@ -1,0 +1,33 @@
+.App {
+    font-family: sans-serif;
+    padding: 10px;
+  }
+  h3{
+    color: #43425D;
+  }
+  span{
+    color: #43425D;
+  }
+  .header{
+      border-bottom: 1px lightGrey solid;
+      padding-bottom: 15px;
+      color: #43425D;
+      display: block;
+  }
+  .dateMainView{
+    text-align: right;
+    color: #43425D;
+    display: block;
+    width: 100%;
+    margin: 15px 0px 30px 0px;
+  }
+  .dateView{
+    display: block;
+  }
+  .tableStyle{
+      background-color: red;
+  }
+
+  .headStyle > th{
+    background-color: yellow !important;
+}

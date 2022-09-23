@@ -2,7 +2,7 @@ import React, { useState, useEffect, lazy } from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import { connect } from "react-redux";
 import { bindActionCreators } from 'redux';
-import { getAllDrivers, getFilterDriver, addDriver, deleteDriver, updateDriver } from '../../actions/drivers';
+import { getAllShift, getFilterShift, addShift, deleteShift, updateShift, getAllBus, getAllDrivers } from '../../actions';
 import moment from 'moment';
 import {
   CBadge,
@@ -16,20 +16,13 @@ import {
   CInput,
 } from '@coreui/react';
 import { Button, Modal, Form, notification, Input } from 'antd';
+import AddShiftModal from './AddShiftModal';
 
 
-const getBadge = status => {
-  switch (status) {
-    case 'Verified': return 'success'
-    case 'Unverified': return 'warning'
-    default: return 'primary'
-  }
-}
-
-const Drivers = (props) => {
+const Shifts = (props) => {
   const [form] = Form.useForm();
   const formRef = React.createRef();
-  console.log('Props in User', props);
+  console.log('Props in Shift', props);
   const history = useHistory()
   const queryPage = useLocation().search.match(/page=([0-9]+)/, '')
   const currentPage = Number(queryPage && queryPage[1] ? queryPage[1] : 1)
@@ -37,11 +30,11 @@ const Drivers = (props) => {
   const [limit, setLimit] = useState(10)
   const [searchText, setSearchText] = useState(null);
   const [state, setState] = useState({
-    isEditingDriver: false,
-    editingDriverId: null,
-    openModal: false,
-    driverName: '',
-    driverPhone: ''
+    isEditingShift: false,
+    editingShiftId: null,
+    openModal: true,
+    shiftName: '',
+    shiftSeats: ''
   });
 
   const layout = {
@@ -52,24 +45,40 @@ const Drivers = (props) => {
   const pageChange = newPage => {
     currentPage !== newPage && history.push(`/drivers?page=${newPage}`)
     setPage(newPage);
-    getDrivers(newPage);
+    getShifts(newPage);
   }
-
+  
   useEffect(() => {
     currentPage !== page && setPage(currentPage);
+    getShifts(page);
     getDrivers(page);
+    getBuses(page);
   }, []);
 
 
   const initState = () => {
     setState({
-      isEditingDriver: false,
-      editingDriverId: null,
-      driverName: '',
-      driverPhone: '',
+      isEditingShift: false,
+      editingShiftId: null,
+      shiftName: '',
+      shiftSeats: '',
       openModal: false,
     })
   }
+  const getShifts = async (_page) => {
+    try {
+      const data = {
+        page: _page, limit, searchText,
+      }
+      const response = await props.actions._getAllShift(data);
+
+      console.log('========> get all shift repsonse', response);
+    } catch (error) {
+      console.log("Error in get list", error);
+    }
+
+  }
+
   const getDrivers = async (_page) => {
     try {
       const data = {
@@ -77,7 +86,21 @@ const Drivers = (props) => {
       }
       const response = await props.actions._getAllDrivers(data);
 
-      console.log('========> get all user repsonse', response);
+      console.log('========> get all driver repsonse', response);
+    } catch (error) {
+      console.log("Error in get list", error);
+    }
+
+  }
+
+  const getBuses = async (_page) => {
+    try {
+      const data = {
+        page: _page, limit, searchText,
+      }
+      const response = await props.actions._getAllBuses(data);
+
+      console.log('========> get all buses repsonse', response);
     } catch (error) {
       console.log("Error in get list", error);
     }
@@ -90,7 +113,7 @@ const Drivers = (props) => {
       limit,
       searchText,
     }
-    const response = await props.actions._getFilterDriver(data);
+    const response = await props.actions._getFilterShift(data);
   }
 
   const showModal = () => {
@@ -104,10 +127,10 @@ const Drivers = (props) => {
     console.log('---------item',item);
     setState({
       ...state,
-      driverName: item.name,
-      driverPhone: item.phone,
-      editingDriverId: item._id,
-      isEditingDriver: true,
+      shiftName: item.name,
+      shiftSeats: item.seats,
+      editingShiftId: item._id,
+      isEditingShift: true,
       openModal: true,
     })
   }
@@ -116,11 +139,11 @@ const Drivers = (props) => {
   const showDeleteDialog = (item) => {
     try {
         Modal.confirm({
-          title: 'Are you sure delete this driver?',
+          title: 'Are you sure delete this shift?',
           okText: 'Yes',
           okType: 'danger',
           cancelText: 'No',
-          onOk: () => onDeleteDriver(item),
+          onOk: () => onDeleteShift(item),
           onCancel() {
             console.log('Cancel');
           },
@@ -131,9 +154,9 @@ const Drivers = (props) => {
     }
   }
 
-  const onDeleteDriver = async (driver) => {
+  const onDeleteShift = async (driver) => {
     try {
-      const removeDriver = await props.actions._deleteDriver(driver._id);
+      const removeShift = await props.actions._deleteShift(driver._id);
       // getDrivers(currentPage);
       initState();
     } catch (error) {
@@ -150,22 +173,22 @@ const Drivers = (props) => {
   const handleOk = async () => {
     try {
 
-      if (state.isEditingDriver) {
+      if (state.isEditingShift) {
         const data = {
-          name: state.driverName,
-          phone: state.driverPhone,
+          name: state.shiftName,
+          seats: state.shiftSeats,
         };
-        const updateResponse = await props.actions._updateDriver({ id: state.editingDriverId, data });
-        getDrivers(currentPage);
+        const updateResponse = await props.actions._updateShift({ id: state.editingShiftId, data });
+        getShifts(currentPage);
         initState();
       } else {
         
         const data = {
-          name: state.driverName,
-          phone: `92${state.driverPhone.slice(1)}`
+          name: state.shiftName,
+          seats: state.shiftSeats
         };
-        const addStrengthResponse  = await props.actions._addDriver(data);
-        getDrivers(currentPage);
+        const addResponse  = await props.actions._addShift(data);
+        getShifts(currentPage);
         initState();
       }
     } catch (error) {
@@ -179,10 +202,13 @@ const Drivers = (props) => {
 
   }
 
-  const userDataArray = (props.allDrivers && props.allDrivers.data) ? props.allDrivers.data : [];
-  const totalPage = (props.allDrivers && props.allDrivers.pages) ? props.allDrivers.pages : 1;
-  const itemsPerPage = (props.allDrivers && props.allDrivers.limit) ? props.allDrivers.limit : 10;
-  console.log('========userDataArray', userDataArray, totalPage, itemsPerPage);
+  const shiftDataArray = (props.allShifts && props.allShifts.data) ? props.allShifts.data : [];
+  const totalPage = (props.allShifts && props.allShifts.pages) ? props.allShifts.pages : 1;
+  const itemsPerPage = (props.allShifts && props.allShifts.limit) ? props.allShifts.limit : 10;
+  console.log('========shiftDataArray', shiftDataArray, totalPage, itemsPerPage);
+  const allDriverArray = (props.allDrivers && props.allDrivers.data) ? props.allDrivers.data : [];
+  const allBusArray = (props.allBuses && props.allBuses.data) ? props.allBuses.data : [];
+  
 
   return (
     <>
@@ -192,7 +218,7 @@ const Drivers = (props) => {
             <CCol xl={12}>
               <CCard>
                 <CCardHeader>
-                  Drivers
+                  Shift
                 </CCardHeader>
                 <CCardBody>
                   <CRow>
@@ -211,13 +237,13 @@ const Drivers = (props) => {
                     </CCol>
                   </CRow>
                   <CDataTable
-                    items={userDataArray}
+                    items={shiftDataArray}
                     loading={props.isLoading}
                     size='lg'
                     fields={[
                       { key: 'name', _classes: 'font-weight-bold', _style: { padding: '0px 30px', width: '250px' } },
                       // 'email',
-                      { key: 'phone', label: 'Number' },
+                      { key: 'seats', label: 'Seats' },
                       // 'location',
                       // { key: 'signUpVerificationStatus', label: 'Status' },
                       // { key: 'selected_peer_group', label: 'Selected Peer Group', _style: { width: '250px' } },
@@ -258,29 +284,30 @@ const Drivers = (props) => {
               </CCard>
               <Modal
                 visible={state.openModal}
-                title="Driver"
+                title="Shift"
                 onCancel={initState}
                 footer={[
-                  state.isEditingDriver ?
+                  state.isEditingShift ?
                     <Button key="submit" type="primary" ghost loading={props.isLoading} size="large" onClick={handleOk}>Update</Button>
                     :
                     <Button key="submit" type="primary" ghost loading={props.isLoading} size="large" onClick={handleOk}>Add</Button>
                 ]}
               >
-                <CRow>
+                <AddShiftModal allDrivers={allDriverArray} allBuses={allBusArray} />
+                {/* <CRow>
                   <CCol xs="12" md="6">
                     <CRow>
                       <CCol xs="12" md="12">
-                        <CInput style={{ marginBottom: '20px' }} value={state.driverName} name='driverName' onChange={(e) => setState({ ...state, driverName: e.target.value })} placeholder='Enter a driver name' />
+                        <CInput style={{ marginBottom: '20px' }} value={state.shiftName} name='shiftName' onChange={(e) => setState({ ...state, shiftName: e.target.value })} placeholder='Enter shift name' />
                       </CCol>
                     </CRow>
                     <CRow>
                       <CCol xs="12" md="12">
-                      <CInput value={state.driverPhone} name='driverPhone' onChange={(e) => setState({ ...state, driverPhone: e.target.value })} placeholder='Enter a driver phone' />
+                      <CInput value={state.shiftSeats} type='number' name='shiftSeats' onChange={(e) => setState({ ...state, shiftSeats: e.target.value })} placeholder='Enter seats count' />
                       </CCol>
                     </CRow>
                   </CCol>
-                </CRow>
+                </CRow> */}
               </Modal>
             </CCol>
           </CRow>
@@ -293,23 +320,27 @@ const Drivers = (props) => {
 function mapDispatchToProps(dispatch) {
   return {
     actions: bindActionCreators({
+      _getAllShift: (data) => getAllShift(data),
+      _getFilterShift: (data) => getFilterShift(data),
+      _addShift: (data) => addShift(data),
+      _deleteShift: (data) => deleteShift(data),
+      _updateShift: (data) => updateShift(data),
       _getAllDrivers: (data) => getAllDrivers(data),
-      _getFilterDriver: (data) => getFilterDriver(data),
-      _addDriver: (data) => addDriver(data),
-      _deleteDriver: (data) => deleteDriver(data),
-      _updateDriver: (data) => updateDriver(data),
+      _getAllBuses: (data) => getAllBus(data),
     }, dispatch)
   }
 }
 
 function mapStateToProps(state) {
-  console.log("==========> Driver",state);
-  const { drivers, basicCodes, peerGroups, loader } = state;
+  console.log("==========> Shift",state);
+  const { shifts, drivers, loader } = state;
   return {
+    allShifts: shifts.allShifts,
     allDrivers: drivers.allDrivers,
+    allBuses: drivers.allBuses,
     isLoading: loader.loading
 
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Drivers);
+export default connect(mapStateToProps, mapDispatchToProps)(Shifts);

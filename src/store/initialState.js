@@ -30,10 +30,14 @@ let initialState = {
     allBuses: {
       data: []
     },
-    bookingManagers: {
+  },
+  shifts: {
+    details: {
+      data: null
+    },
+    allShifts: {
       data: []
     },
-    onlineUser: 0
   },
   allRoles: {
     data: []

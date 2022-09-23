@@ -4,6 +4,7 @@ import auth from './Auth';
 import drivers from './Drivers';
 import buses from './Bus';
 import loader from './loader';
+import shifts from './Shift';
 
 export default combineReducers({
     auth,
@@ -11,4 +12,5 @@ export default combineReducers({
     buses,
     loader,
     dashboard,
+    shifts,
 });

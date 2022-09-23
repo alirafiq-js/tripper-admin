@@ -145,6 +145,12 @@ const sub_admin_nav =  [
     to: '/buses',
     icon: <CIcon name="cil-user" customClasses="c-sidebar-nav-icon"/>,
   },
+  {
+    _tag: 'CSidebarNavItem',
+    name: 'Shift',
+    to: '/shifts',
+    icon: <CIcon name="cil-user" customClasses="c-sidebar-nav-icon"/>,
+  },
   // {
   //   _tag: 'CSidebarNavItem',
   //   name: 'Peer Groups',

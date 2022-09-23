@@ -30,6 +30,8 @@ const Drivers = React.lazy(() => import('./views/drivers/Drivers'));
 const Driver = React.lazy(() => import('./views/drivers/Driver'));
 const Buses = React.lazy(() => import('./views/bus/Buses'));
 const Bus = React.lazy(() => import('./views/bus/Bus'));
+const Shifts = React.lazy(() => import('./views/shift/Shifts'));
+const Shift = React.lazy(() => import('./views/shift/Shift'));
 const CoreUIIcons = React.lazy(() => import('./views/icons/coreui-icons/CoreUIIcons'));
 const Flags = React.lazy(() => import('./views/icons/flags/Flags'));
 const Brands = React.lazy(() => import('./views/icons/brands/Brands'));
@@ -74,6 +76,9 @@ const routes = [
   { path: '/drivers/:id', exact: true, name: 'Driver Details', component: Driver },
   { path: '/buses', exact: true,  name: 'Bus', component: Buses },
   { path: '/buses/:id', exact: true, name: 'Bus Details', component: Bus },
+  { path: '/shifts', exact: true,  name: 'Bus', component: Shifts },
+  { path: '/shifts/add', exact: true, name: 'Add Shift Details', component: Shift },
+  { path: '/shifts/:id', exact: true, name: 'Shift Details', component: Shift },
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },

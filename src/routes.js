@@ -76,7 +76,7 @@ const routes = [
   { path: '/drivers/:id', exact: true, name: 'Driver Details', component: Driver },
   { path: '/buses', exact: true,  name: 'Bus', component: Buses },
   { path: '/buses/:id', exact: true, name: 'Bus Details', component: Bus },
-  { path: '/shifts', exact: true,  name: 'Bus', component: Shifts },
+  { path: '/shifts', exact: true,  name: 'Shift', component: Shifts },
   { path: '/shifts/add', exact: true, name: 'Add Shift Details', component: Shift },
   { path: '/shifts/:id', exact: true, name: 'Shift Details', component: Shift },
   { path: '/theme', name: 'Theme', component: Colors, exact: true },

@@ -36,7 +36,8 @@ const Dashboard = (props) => {
 
   return (
     <>
-      <WidgetsDropdown dashboardData={props.dashboardData.data} />
+    <h1>Welcome to Tripper</h1>
+      {/* <WidgetsDropdown dashboardData={props.dashboardData.data} /> */}
       {/* <CCard>
         <CCardBody>
           <CRow>

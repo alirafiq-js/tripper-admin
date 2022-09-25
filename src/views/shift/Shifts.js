@@ -2,7 +2,7 @@ import React, { useState, useEffect, lazy } from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import { connect } from "react-redux";
 import { bindActionCreators } from 'redux';
-import { getAllShift, getFilterShift, addShift, deleteShift, updateShift, getAllBus, getAllDrivers } from '../../actions';
+import { getAllShift, getFilterShift, addShift, deleteShift, updateShift, getAllBus, getAllDrivers, getAllRoute } from '../../actions';
 import moment from 'moment';
 import {
   CBadge,
@@ -20,8 +20,6 @@ import AddShiftModal from './AddShiftModal';
 
 
 const Shifts = (props) => {
-  const [form] = Form.useForm();
-  const formRef = React.createRef();
   console.log('Props in Shift', props);
   const history = useHistory()
   const queryPage = useLocation().search.match(/page=([0-9]+)/, '')
@@ -32,7 +30,7 @@ const Shifts = (props) => {
   const [state, setState] = useState({
     isEditingShift: false,
     editingShiftId: null,
-    openModal: true,
+    openModal: false,
     shiftName: '',
     shiftSeats: ''
   });
@@ -53,6 +51,7 @@ const Shifts = (props) => {
     getShifts(page);
     getDrivers(page);
     getBuses(page);
+    getRoutes(page);
   }, []);
 
 
@@ -99,8 +98,18 @@ const Shifts = (props) => {
         page: _page, limit, searchText,
       }
       const response = await props.actions._getAllBuses(data);
+    } catch (error) {
+      console.log("Error in get list", error);
+    }
 
-      console.log('========> get all buses repsonse', response);
+  }
+
+  const getRoutes = async (_page) => {
+    try {
+      const data = {
+        page: _page, limit, searchText,
+      }
+      const response = await props.actions._getAllRoutes(data);
     } catch (error) {
       console.log("Error in get list", error);
     }
@@ -124,7 +133,6 @@ const Shifts = (props) => {
   }
 
   const onEdit = (item) => {
-    console.log('---------item',item);
     setState({
       ...state,
       shiftName: item.name,
@@ -208,6 +216,7 @@ const Shifts = (props) => {
   console.log('========shiftDataArray', shiftDataArray, totalPage, itemsPerPage);
   const allDriverArray = (props.allDrivers && props.allDrivers.data) ? props.allDrivers.data : [];
   const allBusArray = (props.allBuses && props.allBuses.data) ? props.allBuses.data : [];
+  const allRouteArray = (props.allRoutes && props.allRoutes.data) ? props.allRoutes.data : [];
   
 
   return (
@@ -225,7 +234,7 @@ const Shifts = (props) => {
                     <CCol xs="12" md="6">
                       <CRow>
                         <CCol xs="12" md="6">
-                        <CInput onChange={(e)=>setSearchText(e.target.value)} id="company" placeholder="Name/Phone" />
+                        <CInput onChange={(e)=>setSearchText(e.target.value)} id="company" placeholder="Name" />
                         </CCol>
                         <CCol xs="12" md="6">
                           <Button ghost onClick={_searchByText}  type='primary'>Search</Button>
@@ -293,21 +302,7 @@ const Shifts = (props) => {
                     <Button key="submit" type="primary" ghost loading={props.isLoading} size="large" onClick={handleOk}>Add</Button>
                 ]}
               >
-                <AddShiftModal allDrivers={allDriverArray} allBuses={allBusArray} />
-                {/* <CRow>
-                  <CCol xs="12" md="6">
-                    <CRow>
-                      <CCol xs="12" md="12">
-                        <CInput style={{ marginBottom: '20px' }} value={state.shiftName} name='shiftName' onChange={(e) => setState({ ...state, shiftName: e.target.value })} placeholder='Enter shift name' />
-                      </CCol>
-                    </CRow>
-                    <CRow>
-                      <CCol xs="12" md="12">
-                      <CInput value={state.shiftSeats} type='number' name='shiftSeats' onChange={(e) => setState({ ...state, shiftSeats: e.target.value })} placeholder='Enter seats count' />
-                      </CCol>
-                    </CRow>
-                  </CCol>
-                </CRow> */}
+                <AddShiftModal allDrivers={allDriverArray} allBuses={allBusArray}  allRoutes={allRouteArray} />
               </Modal>
             </CCol>
           </CRow>
@@ -327,18 +322,20 @@ function mapDispatchToProps(dispatch) {
       _updateShift: (data) => updateShift(data),
       _getAllDrivers: (data) => getAllDrivers(data),
       _getAllBuses: (data) => getAllBus(data),
+      _getAllRoutes: (data) => getAllRoute(data),
     }, dispatch)
   }
 }
 
 function mapStateToProps(state) {
   console.log("==========> Shift",state);
-  const { shifts, drivers, loader } = state;
+  const { shifts, drivers, buses, loader, routes } = state;
   return {
     allShifts: shifts.allShifts,
     allDrivers: drivers.allDrivers,
-    allBuses: drivers.allBuses,
-    isLoading: loader.loading
+    allBuses: buses.allBuses,
+    allRoutes: routes.allRoutes,
+    isLoading: loader.loading,
 
   }
 }

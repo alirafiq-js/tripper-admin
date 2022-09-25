@@ -39,6 +39,14 @@ let initialState = {
       data: []
     },
   },
+  routes: {
+    details: {
+      data: null
+    },
+    allRoutes: {
+      data: []
+    },
+  },
   allRoles: {
     data: []
   },

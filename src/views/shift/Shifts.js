@@ -30,7 +30,7 @@ const Shifts = (props) => {
   const [state, setState] = useState({
     isEditingShift: false,
     editingShiftId: null,
-    openModal: false,
+    openModal: true,
     shiftName: '',
     shiftSeats: ''
   });
@@ -78,10 +78,11 @@ const Shifts = (props) => {
 
   }
 
-  const getDrivers = async (_page) => {
+  const getDrivers = async (page) => {
     try {
       const data = {
-        page: _page, limit, searchText,
+        type: 'all',
+        page
       }
       const response = await props.actions._getAllDrivers(data);
 
@@ -92,10 +93,11 @@ const Shifts = (props) => {
 
   }
 
-  const getBuses = async (_page) => {
+  const getBuses = async (page) => {
     try {
       const data = {
-        page: _page, limit, searchText,
+        type: 'all',
+        page
       }
       const response = await props.actions._getAllBuses(data);
     } catch (error) {
@@ -104,10 +106,11 @@ const Shifts = (props) => {
 
   }
 
-  const getRoutes = async (_page) => {
+  const getRoutes = async (page) => {
     try {
       const data = {
-        page: _page, limit, searchText,
+        type: 'all',
+        page
       }
       const response = await props.actions._getAllRoutes(data);
     } catch (error) {

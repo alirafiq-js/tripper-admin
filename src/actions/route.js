@@ -9,7 +9,7 @@ import {
     ROUTE_GET_DETAILS_SUCCESS,
 } from '../constants/actionTypes';
 
-export function getAllRoute({ page, limit, searchText }) {
+export function getAllRoute({ page=1, limit = 10, searchText, type }) {
 
     return function (dispatch) {
         return new Promise(async function (resolve, reject) {
@@ -20,6 +20,9 @@ export function getAllRoute({ page, limit, searchText }) {
             let uri =  `/route/list/?page=${page}&limit=${limit}`;
             if(searchText){
                 uri = `${uri}&search=${searchText}`
+            }
+            if(type){
+                uri = `${uri}&type=${type}`
             }
             HTTP('get',uri, null, { Authorization: `Bearer ${token}` })
                 .then(function (response) {

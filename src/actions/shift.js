@@ -10,7 +10,7 @@ import {
 } from '../constants/actionTypes';
 
 
-export function getAllShift({ page, limit, searchText }) {
+export function getAllShift({ page, limit, searchText, type }) {
 
     return function (dispatch) {
         return new Promise(async function (resolve, reject) {
@@ -21,6 +21,9 @@ export function getAllShift({ page, limit, searchText }) {
             let uri =  `/shift/list/?page=${page}&limit=${limit}`;
             if(searchText){
                 uri = `${uri}&search=${searchText}`
+            }
+            if(type){
+                uri = `${uri}&search=${searchText}&type=${type}`
             }
             HTTP('get',uri, null, { Authorization: `Bearer ${token}` })
                 .then(function (response) {

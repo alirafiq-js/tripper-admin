@@ -10,7 +10,6 @@ import initialState from '../store/initialState';
 import { filterDuplicate } from '../utils/helper';
 
 const route_reducer = (state = initialState.routes, action) => {
-    console.log('---------state in resport route', state,action);
     switch (action.type) {
 
         case ROUTE_EMPTY_SUCCESS:

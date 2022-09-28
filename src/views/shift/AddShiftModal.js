@@ -20,7 +20,7 @@ const { RangePicker } = DatePicker;
 const dateFormat = 'YYYY/MM/DD';
 
 const AddShift = (props) => {
-  console.log('----------props add modal',props)
+  // console.log('----------props add modal',props)
   const history = useHistory();
   const [form] = Form.useForm();
   const formRef = React.createRef();
@@ -64,19 +64,12 @@ const AddShift = (props) => {
     months.push(<Option key={i}>{months[i]}</Option>);
   }
 
-const handleChange = (key,value) => {
-  console.log(`selected ${key} ${value}`);
+const handleChangeFields = (e) => {
+  const { name, value } = e.target;
+  console.log(`change field ${name} and ${value}`);
   setStatePayload({
     ...statePayload,
-    key: value
-  })
-};
-
-const handleChangeMonth = (key,value) => {
-  console.log(`selected ${value}`);
-  setStatePayload({
-    ...statePayload,
-    key: value
+    [name]: value
   })
 };
 
@@ -110,7 +103,7 @@ const handleChangeMonth = (key,value) => {
           ]}
           form={form}
         >
-          <Input onChange={(e)=>handleChange(e.target.name,e.target.value)} placeholder="Name" />
+          <Input name='name' onChange={(e)=>handleChangeFields(e)} placeholder="Name" />
         </Form.Item>
         <Form.Item
           label="Days"
@@ -131,7 +124,7 @@ const handleChangeMonth = (key,value) => {
             }}
             placeholder="Please select days"
             defaultValue={[]}
-            onChange={handleChange}
+            onChange={(val) => setStatePayload({ ...statePayload, days: val })}
           >
             {weekdays}
           </Select>
@@ -154,7 +147,7 @@ const handleChangeMonth = (key,value) => {
             }}
             placeholder="Please select month"
             defaultValue={[]}
-            onChange={handleChangeMonth}
+            onChange={(val) => setStatePayload({ ...statePayload, month: val })}
           >
             {months}
           </Select>
@@ -169,7 +162,7 @@ const handleChangeMonth = (key,value) => {
           ]}
           form={form}
         >
-          <Radio.Group onChange={(e) => console.log('----------e', e)}>
+          <Radio.Group name='shiftType' onChange={(e) => handleChangeFields(e)}>
             <Radio value="weekly"> Weekly </Radio>
             <Radio value="monthly"> Monthly </Radio>
           </Radio.Group>
@@ -186,7 +179,7 @@ const handleChangeMonth = (key,value) => {
           ]}
           form={form}
         >
-          <Select>
+          <Select onChange={(val) => setStatePayload({ ...statePayload, driverId: val })} >
 
             {
               props?.allDrivers.map((item, index) => (
@@ -207,7 +200,7 @@ const handleChangeMonth = (key,value) => {
           ]}
           form={form}
         >
-          <Select>
+          <Select onChange={(val) => setStatePayload({ ...statePayload, busId: val })} >
             {
               props?.allBuses.map((item, index) => (
                 <Select.Option value={item.name} key={index} >{item.name}</Select.Option>
@@ -227,7 +220,7 @@ const handleChangeMonth = (key,value) => {
           ]}
           form={form}
         >
-          <Select>
+          <Select onChange={(val) => setStatePayload({ ...statePayload, routeId: val })} >
           {
               props?.allRoutes.map((item, index) => (
                 <Select.Option value={item.name} key={index} >{item.name}</Select.Option>

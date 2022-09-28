@@ -14,7 +14,6 @@ import initialState from '../store/initialState';
 import { filterDuplicate } from '../utils/helper';
 
 const driver_reducer = (state = initialState.drivers, action) => {
-    console.log('---------state in resport user', state,action);
     switch (action.type) {
 
         case DRIVERS_EMPTY_SUCCESS:

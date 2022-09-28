@@ -15,13 +15,15 @@ import {
   CPagination,
   CInput,
 } from '@coreui/react';
-import { Button, Modal, Form, notification, Input } from 'antd';
+import { Button, Modal, Form, notification, Input, Select, Radio, TimePicker } from 'antd';
 import AddShiftModal from './AddShiftModal';
 
 
 const Shifts = (props) => {
   console.log('Props in Shift', props);
   const history = useHistory()
+  const [form] = Form.useForm();
+  const formRef = React.createRef();
   const queryPage = useLocation().search.match(/page=([0-9]+)/, '')
   const currentPage = Number(queryPage && queryPage[1] ? queryPage[1] : 1)
   const [page, setPage] = useState(currentPage)
@@ -30,10 +32,22 @@ const Shifts = (props) => {
   const [state, setState] = useState({
     isEditingShift: false,
     editingShiftId: null,
-    openModal: true,
+    openModal: false,
     shiftName: '',
     shiftSeats: ''
   });
+  const [statePayload, setStatePayload] = useState({
+    name: '',
+    busId: null,
+    routeId: null,
+    driverId: null,
+    startTime: '09:00',
+    shiftType: 'weekly',
+    month: "March",
+    days: []
+  });
+
+  const { Option } = Select;
 
   const layout = {
     labelCol: { span: 8 },
@@ -41,7 +55,7 @@ const Shifts = (props) => {
   };
 
   const pageChange = newPage => {
-    currentPage !== newPage && history.push(`/drivers?page=${newPage}`)
+    currentPage !== newPage && history.push(`/shifts?page=${newPage}`)
     setPage(newPage);
     getShifts(newPage);
   }
@@ -59,10 +73,18 @@ const Shifts = (props) => {
     setState({
       isEditingShift: false,
       editingShiftId: null,
-      shiftName: '',
-      shiftSeats: '',
       openModal: false,
-    })
+    });
+    setStatePayload({
+      name: '',
+      busId: null,
+      routeId: null,
+      driverId: null,
+      startTime: null,
+      shiftType: '',
+      month: 0,
+      days: []
+    });
   }
   const getShifts = async (_page) => {
     try {
@@ -136,14 +158,23 @@ const Shifts = (props) => {
   }
 
   const onEdit = (item) => {
+    console.log('-----------item',item);
+    setStatePayload({
+      name: item.name,
+      busId: item.busId._id,
+      routeId: item.routeId._id,
+      driverId: item.driverId._id,
+      startTime: moment(item.startTime),
+      shiftType: item.shiftType,
+      month: item.month,
+      days: item.days,
+    })
     setState({
-      ...state,
-      shiftName: item.name,
-      shiftSeats: item.seats,
+      openModal: true,
       editingShiftId: item._id,
       isEditingShift: true,
-      openModal: true,
-    })
+    });
+    console.log('-------state payload',statePayload)
   }
 
 
@@ -165,9 +196,9 @@ const Shifts = (props) => {
     }
   }
 
-  const onDeleteShift = async (driver) => {
+  const onDeleteShift = async (shift) => {
     try {
-      const removeShift = await props.actions._deleteShift(driver._id);
+      const removeShift = await props.actions._deleteShift(shift._id);
       // getDrivers(currentPage);
       initState();
     } catch (error) {
@@ -193,12 +224,8 @@ const Shifts = (props) => {
         getShifts(currentPage);
         initState();
       } else {
-        
-        const data = {
-          name: state.shiftName,
-          seats: state.shiftSeats
-        };
-        const addResponse  = await props.actions._addShift(data);
+        console.log('----------Payload state', statePayload)
+        const addResponse = await props.actions._addShift(statePayload);
         getShifts(currentPage);
         initState();
       }
@@ -213,14 +240,46 @@ const Shifts = (props) => {
 
   }
 
-  const shiftDataArray = (props.allShifts && props.allShifts.data) ? props.allShifts.data : [];
-  const totalPage = (props.allShifts && props.allShifts.pages) ? props.allShifts.pages : 1;
-  const itemsPerPage = (props.allShifts && props.allShifts.limit) ? props.allShifts.limit : 10;
-  console.log('========shiftDataArray', shiftDataArray, totalPage, itemsPerPage);
-  const allDriverArray = (props.allDrivers && props.allDrivers.data) ? props.allDrivers.data : [];
-  const allBusArray = (props.allBuses && props.allBuses.data) ? props.allBuses.data : [];
-  const allRouteArray = (props.allRoutes && props.allRoutes.data) ? props.allRoutes.data : [];
+
+  const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'Auguest', 'September', 'October', 'November', 'December'];
+
+  for (let i = 0; i < 7; i++) {
+    weekdays.push(<Option key={i}>{weekdays[i]}</Option>);
+  }
+
+  for (let i = 0; i < 12; i++) {
+    months.push(<Option key={i}>{months[i]}</Option>);
+  }
+
+const handleChange = (key,value) => {
+  console.log(`selected ${key} ${value}`);
+  setStatePayload({
+    ...statePayload,
+    key: value
+  })
+};
+
+const handleChangeFields = (e) => {
+  const { name, value } = e.target;
+  console.log(`change field ${name} and ${value}`);
+  setStatePayload({
+    ...statePayload,
+    [name]: value
+  })
+};
   
+
+const shiftDataArray = (props.allShifts && props.allShifts.data) ? props.allShifts.data : [];
+const totalPage = (props.allShifts && props.allShifts.pages) ? props.allShifts.pages : 1;
+const itemsPerPage = (props.allShifts && props.allShifts.limit) ? props.allShifts.limit : 10;
+
+const allDriverArray = (props.allDrivers && props.allDrivers.data) ? props.allDrivers.data : [];
+const allBusArray = (props.allBuses && props.allBuses.data) ? props.allBuses.data : [];
+const allRouteArray = (props.allRoutes && props.allRoutes.data) ? props.allRoutes.data : [];
+
+console.log('-------state payload 2',statePayload)
+
 
   return (
     <>
@@ -253,13 +312,17 @@ const Shifts = (props) => {
                     loading={props.isLoading}
                     size='lg'
                     fields={[
-                      { key: 'name', _classes: 'font-weight-bold', _style: { padding: '0px 30px', width: '250px' } },
-                      // 'email',
-                      { key: 'seats', label: 'Seats' },
+                      { key: 'name', _classes: 'font-weight-bold', _style: { padding: '0px 30px' } },
+                      { key: 'busId', label: 'Bus' },
+                      { key: 'driverId', label: 'Driver' },
+                      { key: 'routeId', label: 'Route' },
+                      { key: 'shiftType', label: 'Shift Type' },
+                      'month',
+                      'days',
                       // 'location',
                       // { key: 'signUpVerificationStatus', label: 'Status' },
                       // { key: 'selected_peer_group', label: 'Selected Peer Group', _style: { width: '250px' } },
-                      { key: 'created', label: 'Created', _style: { width: '300px' } },
+                      { key: 'created', label: 'Created' },
                       'actions'
                     ]}
                     hover
@@ -268,6 +331,36 @@ const Shifts = (props) => {
                     activePage={page}
                     clickableRows
                     scopedSlots={{
+                      'busId':
+                      (item) => (
+                        <td>
+                          {item.busId.name}
+                        </td>
+                      ),
+                      'driverId':
+                      (item) => (
+                        <td>
+                          {item.driverId.name}
+                        </td>
+                      ),
+                      'routeId':
+                      (item) => (
+                        <td>
+                          {item.routeId.name}
+                        </td>
+                      ),
+                      'month':
+                      (item) => (
+                        <td>
+                          {moment().month(item.month).format("MMMM")}
+                        </td>
+                      ),
+                      'days':
+                      (item) => (
+                        <td>
+                          {item.days.map((_day) => <span style={{ marginRight: 5 }}>{moment().day(_day).format("dddd")}</span>)}
+                        </td>
+                      ),
                         'created':
                         (item) => (
                           <td>
@@ -278,7 +371,7 @@ const Shifts = (props) => {
                         (item) => (
                           <td>
                             <div>
-                              <Button type="primary" onClick={() => onEdit(item)} ghost>Edit</Button>
+                              {/* <Button type="primary" onClick={() => onEdit(item)} ghost>Edit</Button> */}
                               <Button type="danger" onClick={() => showDeleteDialog(item)} style={{ marginLeft: '5px' }} ghost>Delete</Button>
                             </div>
                           </td>
@@ -305,7 +398,179 @@ const Shifts = (props) => {
                     <Button key="submit" type="primary" ghost loading={props.isLoading} size="large" onClick={handleOk}>Add</Button>
                 ]}
               >
-                <AddShiftModal allDrivers={allDriverArray} allBuses={allBusArray}  allRoutes={allRouteArray} />
+                {/* <AddShiftModal openModal={state.openModal} initState={initState} allDrivers={allDriverArray} allBuses={allBusArray} allRoutes={allRouteArray} /> */}
+                <Form
+                  labelCol={{
+                    span: 4,
+                  }}
+                  wrapperCol={{
+                    span: 14,
+                  }}
+                  form={form}
+                  ref={formRef}
+                  name="control-ref"
+                  layout="horizontal"
+                  // onValuesChange={onFormLayoutChange}
+                  onFinish={(value) => console.log('---------------on Finsih', value)}
+                >
+
+                  <Form.Item
+
+
+                    label="Name"
+                    valuePropName="checked"
+                    rules={[
+                      {
+                        required: true,
+                        message: 'Please type name'
+                      },
+                    ]}
+                    form={form}
+                  >
+                    <Input name='name' value={statePayload.name} onChange={(e) => handleChangeFields(e)} placeholder="Name" />
+                  </Form.Item>
+                  <Form.Item
+                    label="Days"
+                    valuePropName="checked"
+                    rules={[
+                      {
+                        required: true,
+                        message: 'Please select days'
+                      },
+                    ]}
+                    form={form}
+                  >
+                    <Select
+                      mode="multiple"
+                      allowClear
+                      style={{
+                        width: '100%',
+                      }}
+                      placeholder="Please select days"
+                      defaultValue={statePayload.days}
+                      onChange={(val) => setStatePayload({ ...statePayload, days: val })}
+                    >
+                      {weekdays}
+                    </Select>
+                  </Form.Item>
+                  <Form.Item
+                    label="Months"
+                    valuePropName="checked"
+                    rules={[
+                      {
+                        required: true,
+                        message: 'Please select days'
+                      },
+                    ]}
+                    form={form}
+                  >
+                    <Select
+                      allowClear
+                      style={{
+                        width: '100%',
+                      }}
+                      placeholder="Please select month"
+                      defaultValue={statePayload.month}
+                      onChange={(val) => setStatePayload({ ...statePayload, month: val })}
+                    >
+                      {months}
+                    </Select>
+                  </Form.Item>
+                  <Form.Item
+                    label="Shift Type"
+                    rules={[
+                      {
+                        required: true,
+                        message: 'Please select shift type'
+                      },
+                    ]}
+                    form={form}
+                  >
+                    <Radio.Group name='shiftType' value={statePayload.shiftType} onChange={(e) => handleChangeFields(e)}>
+                      <Radio value="weekly"> Weekly </Radio>
+                      <Radio value="monthly"> Monthly </Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                  <Form.Item
+                    label="Driver"
+                    name="driver"
+                    placeholder="Please select driver"
+                    rules={[
+                      {
+                        required: true,
+                        message: 'Please select driver'
+                      },
+                    ]}
+                    form={form}
+                  >
+                    <Select defaultValue={statePayload.driverId} value={statePayload.driverId} onChange={(val) => setStatePayload({ ...statePayload, driverId: val })} >
+
+                      {
+                        allDriverArray.map((item, index) => (
+                          <Select.Option value={item._id} key={index} >{item.name}</Select.Option>
+                        ))
+                      }
+                    </Select>
+                  </Form.Item>
+                  <Form.Item
+                    label="Bus"
+                    name="bus"
+                    placeholder="Please select bus"
+                    rules={[
+                      {
+                        required: true,
+                        message: 'Please select bus'
+                      },
+                    ]}
+                    form={form}
+                  >
+                    <Select defaultValue={statePayload.busId} value={statePayload.busId} onChange={(val) => setStatePayload({ ...statePayload, busId: val })} >
+                      {
+                      allBusArray.map((item, index) => (
+                          <Select.Option value={item._id} key={index} >{item.name}</Select.Option>
+                        ))
+                      }
+                    </Select>
+                  </Form.Item>
+                  <Form.Item
+                    label="Route"
+                    name="route"
+                    placeholder="Please select route"
+                    rules={[
+                      {
+                        required: true,
+                        message: 'Please select route'
+                      },
+                    ]}
+                    form={form}
+                  >
+                    <Select defaultValue={statePayload.routeId} value={statePayload.routeId} onChange={(val) => setStatePayload({ ...statePayload, routeId: val })} >
+                      {
+                        allRouteArray.map((item, index) => (
+                          <Select.Option value={item._id} key={index} >{item.name}</Select.Option>
+                        ))
+                      }
+                    </Select>
+                  </Form.Item>
+                  <Form.Item
+                    label="Timing"
+                    name="datetime"
+                    rules={[
+                      {
+                        required: true,
+                        message: 'Please select timing'
+                      },
+                    ]}
+                    form={form}
+                  >
+                    {/* <RangePicker
+            // defaultValue={[moment('2015/01/01', dateFormat), moment('2015/01/01', dateFormat)]}
+            format={dateFormat}
+            onChange={(val) => console.log('-------- val', val)}
+          /> */}
+                    <TimePicker value={statePayload.startTime} onChange={(val) => setStatePayload({ ...statePayload, startTime: moment(val).format('HH:mm') })} format={'HH:mm'} />
+                  </Form.Item>
+                </Form>
               </Modal>
             </CCol>
           </CRow>

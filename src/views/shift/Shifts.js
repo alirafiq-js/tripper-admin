@@ -41,9 +41,9 @@ const Shifts = (props) => {
     busId: null,
     routeId: null,
     driverId: null,
-    startTime: '09:00',
+    startTime: null,
     shiftType: 'weekly',
-    month: "March",
+    month: moment().format('MMMM'),
     days: []
   });
 
@@ -70,6 +70,7 @@ const Shifts = (props) => {
 
 
   const initState = () => {
+    console.log("-============cloas call")
     setState({
       isEditingShift: false,
       editingShiftId: null,
@@ -81,8 +82,8 @@ const Shifts = (props) => {
       routeId: null,
       driverId: null,
       startTime: null,
-      shiftType: '',
-      month: 0,
+      shiftType: 'weekly',
+      month: moment().format('MMMM'),
       days: []
     });
   }
@@ -281,6 +282,18 @@ const allRouteArray = (props.allRoutes && props.allRoutes.data) ? props.allRoute
 console.log('-------state payload 2',statePayload)
 
 
+  form.setFieldsValue({
+    bus: statePayload.busId,
+    name: statePayload.name,
+    bus: statePayload.busId,
+    route: statePayload.routeId,
+    driver: statePayload.driverId,
+    // startTime: statePayload.startTime,
+    shiftType: statePayload.shiftType,
+    month: statePayload.month,
+    weekdays: statePayload.days
+  });
+
   return (
     <>
       <CCard>
@@ -391,6 +404,7 @@ console.log('-------state payload 2',statePayload)
                 visible={state.openModal}
                 title="Shift"
                 onCancel={initState}
+                destroyOnClose
                 footer={[
                   state.isEditingShift ?
                     <Button key="submit" type="primary" ghost loading={props.isLoading} size="large" onClick={handleOk}>Update</Button>
@@ -418,6 +432,7 @@ console.log('-------state payload 2',statePayload)
 
 
                     label="Name"
+                    name='name'
                     valuePropName="checked"
                     rules={[
                       {
@@ -431,6 +446,7 @@ console.log('-------state payload 2',statePayload)
                   </Form.Item>
                   <Form.Item
                     label="Days"
+                    name="weekdays"
                     valuePropName="checked"
                     rules={[
                       {
@@ -455,6 +471,7 @@ console.log('-------state payload 2',statePayload)
                   </Form.Item>
                   <Form.Item
                     label="Months"
+                    name="month"
                     valuePropName="checked"
                     rules={[
                       {
@@ -478,6 +495,7 @@ console.log('-------state payload 2',statePayload)
                   </Form.Item>
                   <Form.Item
                     label="Shift Type"
+                    name="shiftType"
                     rules={[
                       {
                         required: true,
@@ -554,7 +572,7 @@ console.log('-------state payload 2',statePayload)
                   </Form.Item>
                   <Form.Item
                     label="Timing"
-                    name="datetime"
+                    name="startTime"
                     rules={[
                       {
                         required: true,

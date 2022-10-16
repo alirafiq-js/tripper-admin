@@ -10,7 +10,6 @@ import initialState from '../store/initialState';
 import { filterDuplicate } from '../utils/helper';
 
 const bus_reducer = (state = initialState.shifts, action) => {
-    console.log('---------state in resport buses', state,action);
     switch (action.type) {
 
         case SHIFT_EMPTY_SUCCESS:
@@ -30,9 +29,7 @@ const bus_reducer = (state = initialState.shifts, action) => {
             }
 
         case SHIFT_GET_SUCCESS:
-            console.log('-----------------case',action.data)
             const filtered = filterDuplicate(state.allShifts.data, action.data.data);
-            console.log('-----------------case filtered',filtered)
             return {
                 ...state,
                 allShifts: {

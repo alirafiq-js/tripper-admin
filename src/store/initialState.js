@@ -39,6 +39,11 @@ let initialState = {
       data: []
     },
   },
+  bookings: {
+    allBookings: {
+      data: []
+    },
+  },
   routes: {
     details: {
       data: null

@@ -151,6 +151,12 @@ const sub_admin_nav =  [
     to: '/shifts',
     icon: <CIcon name="cil-user" customClasses="c-sidebar-nav-icon"/>,
   },
+  {
+    _tag: 'CSidebarNavItem',
+    name: 'Bookings',
+    to: '/bookings',
+    icon: <CIcon name="cil-user" customClasses="c-sidebar-nav-icon"/>,
+  },
   // {
   //   _tag: 'CSidebarNavItem',
   //   name: 'Peer Groups',

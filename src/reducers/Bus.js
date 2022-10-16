@@ -10,7 +10,6 @@ import initialState from '../store/initialState';
 import { filterDuplicate } from '../utils/helper';
 
 const bus_reducer = (state = initialState.buses, action) => {
-    console.log('---------state in resport buses', state,action);
     switch (action.type) {
 
         case BUS_EMPTY_SUCCESS:

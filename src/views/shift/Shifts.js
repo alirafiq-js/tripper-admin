@@ -16,7 +16,7 @@ import {
   CInput,
 } from '@coreui/react';
 import { Button, Modal, Form, notification, Input, Select, Radio, TimePicker } from 'antd';
-import AddShiftModal from './AddShiftModal';
+import ShiftDetails from './Shift';
 
 
 const Shifts = (props) => {
@@ -34,7 +34,9 @@ const Shifts = (props) => {
     editingShiftId: null,
     openModal: false,
     shiftName: '',
-    shiftSeats: ''
+    shiftSeats: '',
+    openDetailModal: false,
+    shiftId: null,
   });
   const [statePayload, setStatePayload] = useState({
     name: '',
@@ -70,11 +72,11 @@ const Shifts = (props) => {
 
 
   const initState = () => {
-    console.log("-============cloas call")
     setState({
       isEditingShift: false,
       editingShiftId: null,
       openModal: false,
+      openDetailModal: false,
     });
     setStatePayload({
       name: '',
@@ -241,6 +243,13 @@ const Shifts = (props) => {
 
   }
 
+  const detailModalToggle = (toggle,shiftId) => {
+    setState({
+      ...state,
+      shiftId,
+      openDetailModal: toggle
+    });
+  }
 
   const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'Auguest', 'September', 'October', 'November', 'December'];
@@ -332,6 +341,7 @@ console.log('-------state payload 2',statePayload)
                       { key: 'shiftType', label: 'Shift Type' },
                       'month',
                       'days',
+                      { key: 'startTime', label: 'Start time' },
                       // 'location',
                       // { key: 'signUpVerificationStatus', label: 'Status' },
                       // { key: 'selected_peer_group', label: 'Selected Peer Group', _style: { width: '250px' } },
@@ -342,7 +352,8 @@ console.log('-------state payload 2',statePayload)
                     striped
                     itemsPerPage={itemsPerPage}
                     activePage={page}
-                    clickableRows
+                    // clickableRows
+                    // onRowClick={() => detailModalToggle(true)}
                     scopedSlots={{
                       'busId':
                       (item) => (
@@ -382,9 +393,9 @@ console.log('-------state payload 2',statePayload)
                         ),
                         'actions':
                         (item) => (
-                          <td>
+                          <td disabled>
                             <div>
-                              {/* <Button type="primary" onClick={() => onEdit(item)} ghost>Edit</Button> */}
+                              <Button type="primary" onClick={() => detailModalToggle(true, item._id)} ghost>Details</Button>
                               <Button type="danger" onClick={() => showDeleteDialog(item)} style={{ marginLeft: '5px' }} ghost>Delete</Button>
                             </div>
                           </td>
@@ -589,6 +600,21 @@ console.log('-------state payload 2',statePayload)
                     <TimePicker value={statePayload.startTime} onChange={(val) => setStatePayload({ ...statePayload, startTime: moment(val).format('HH:mm') })} format={'HH:mm'} />
                   </Form.Item>
                 </Form>
+              </Modal>
+              <Modal
+                visible={state.openDetailModal}
+                title="Details"
+                onCancel={initState}
+                destroyOnClose
+                width={1000}
+                // footer={[
+                //   state.isEditingShift ?
+                //     <Button key="submit" type="primary" ghost loading={props.isLoading} size="large" onClick={handleOk}>Update</Button>
+                //     :
+                //     <Button key="submit" type="primary" ghost loading={props.isLoading} size="large" onClick={handleOk}>Add</Button>
+                // ]}
+              >
+                <ShiftDetails detailModalToggle={detailModalToggle} shiftId={state.shiftId} />
               </Modal>
             </CCol>
           </CRow>

@@ -243,12 +243,18 @@ const Shifts = (props) => {
 
   }
 
-  const detailModalToggle = (toggle,shiftId) => {
-    setState({
-      ...state,
-      shiftId,
-      openDetailModal: toggle
-    });
+  const detailModalToggle = (toggle,data) => {
+    // setState({
+    //   ...state,
+    //   shiftId,
+    //   openDetailModal: toggle
+    // });
+    // history.push(`/shifts/details`, data)
+
+    props.history.push({ 
+      pathname: '/shifts/details',
+      state: data
+     });
   }
 
   const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -395,7 +401,7 @@ console.log('-------state payload 2',statePayload)
                         (item) => (
                           <td disabled>
                             <div>
-                              <Button type="primary" onClick={() => detailModalToggle(true, item._id)} ghost>Details</Button>
+                              <Button type="primary" onClick={() => detailModalToggle(true, item)} ghost>Details</Button>
                               <Button type="danger" onClick={() => showDeleteDialog(item)} style={{ marginLeft: '5px' }} ghost>Delete</Button>
                             </div>
                           </td>

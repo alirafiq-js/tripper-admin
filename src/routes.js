@@ -42,6 +42,7 @@ const Colors = React.lazy(() => import('./views/theme/colors/Colors'));
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'));
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'));
 const Bookings = React.lazy(() => import('./views/booking/Bookings'));
+const PassengerShift = React.lazy(() => import('./views/passengers/PassengerShift'));
 // const Roles = React.lazy(() => import('./views/role/Roles'));
 // const Role = React.lazy(() => import('./views/role/Role'));
 // const BookingManagers = React.lazy(() => import('./views/bookingManagers/BookingManagers'));
@@ -80,6 +81,8 @@ const routes = [
   { path: '/shifts', exact: true,  name: 'Shift', component: Shifts },
   { path: '/shifts/add', exact: true, name: 'Add Shift Details', component: Shift },
   { path: '/shifts/:id', exact: true, name: 'Shift Details', component: Shift },
+  { path: '/shifts/details', exact: true, name: 'Details', component: Shift },
+  { path: '/passenger/shift/list', exact: true, name: 'Passneger Shift List', component: PassengerShift },
   { path: '/bookings', exact: true,  name: 'Booking', component: Bookings },
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },

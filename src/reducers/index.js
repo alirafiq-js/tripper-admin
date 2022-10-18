@@ -7,6 +7,7 @@ import loader from './loader';
 import shifts from './Shift';
 import routes from './Route';
 import bookings from './Booking';
+import passengers from './Passenger';
 
 export default combineReducers({
     auth,
@@ -16,5 +17,6 @@ export default combineReducers({
     dashboard,
     shifts,
     routes,
-    bookings
+    bookings,
+    passengers,
 });

@@ -160,6 +160,14 @@ let initialState = {
   invoices: {
     data: []
   },
+  passenger: {
+    details: {
+      data: null
+    },
+    allPassengers: {
+      data: []
+    },
+  },
 
 };
 

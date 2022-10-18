@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import { useHistory, useLocation } from 'react-router-dom';
 import _ from 'lodash';
 import moment from 'moment';
-import { getShiftDetails } from '../../actions/shift';
+import { getPassengerDetails } from '../../actions';
 import { Button, notification, Modal } from 'antd';
 import {
   CCard, CCardBody, CCol, CRow, CLabel,
@@ -22,20 +22,20 @@ import CIcon from '@coreui/icons-react'
 
 import style from './style.css'
 
-const Shift = (props) => {
+const Passenger = (props) => {
   const history = useHistory();
   const location = useLocation();
-
+  const { search} = location;
   useEffect(() => {
-    console.log('---------location-----------',location.state)
-    // _getShitfData(props.shiftId);
+    console.log('---------location-----------',location)
+    _getPassengerData(search.split('?')[1]);
   }, []);
 
-  const _getShitfData = async (id) => {
+  const _getPassengerData = async (id) => {
     try {
 
-      const response = await props.actions._getShiftDetails(id);
-      console.log('========> get user repsonse', response);
+      const response = await props.actions._getPassengerDetails(id);
+      console.log('========> get passenger repsonse', response);
     } catch (error) {
       console.log("Error in get list", error);
     }
@@ -63,6 +63,24 @@ const Shift = (props) => {
 
   }
 
+  const showDeleteDriverDialog = (item) => {
+    try {
+      Modal.confirm({
+        title: 'Are you sure delete this user?',
+        okText: 'Yes',
+        okType: 'danger',
+        cancelText: 'No',
+        onOk: () => onDeleteDriver(item),
+        onCancel() {
+          console.log('Cancel');
+        },
+      });
+
+    } catch (error) {
+
+    }
+  }
+
   console.log("===========>PROPS FROM TABLE", props);
 
   // const userData = props.userDetails.data;
@@ -85,12 +103,17 @@ const dataArray = (location.state && location.state.customers) ? location.state.
             <CRow>
               <CCol lg={12} md={12}>
                 <CDataTable
-                  // items={props.shiftDetails && props.shiftDetails.data ? props.shiftDetails.data : []}
-                  items={dataArray}
+                  items={props.passengerDetails && props.passengerDetails.data ? props.passengerDetails.data : []}
                   fields={[
-                    { key: 'name', label: 'Passenger', _classes: 'font-weight-bold' },
-                    { key: 'pickup', label: "Pickup stop", _classes: 'font-weight-bold' },
-                    { key: 'dropoff', label: "Dropoff stop", _classes: 'font-weight-bold' },
+                    { key: 'name', label: 'Passenger name', _classes: 'font-weight-bold' },
+                    { key: 'phone', label: 'Passenger phone', _classes: 'font-weight-bold' },
+                    { key: 'email', label: 'Passenger email', _classes: 'font-weight-bold' },
+                    { key: 'amount', label: "Amount", _classes: 'font-weight-bold' },
+                    { key: 'upShift', label: "Up shift", _classes: 'font-weight-bold' },
+                    { key: 'downShift', label: "Down shift", _classes: 'font-weight-bold' },
+                    { key: 'plan', label: "Plan", _classes: 'font-weight-bold' },
+                    { key: 'status', label: "Status", _classes: 'font-weight-bold' },
+                    { key: 'created', label: "Created", _classes: 'font-weight-bold' },
                     // { key: 'upPickupStopId', label: "Up Pickup stop", _classes: 'font-weight-bold' },
                     // { key: 'upDropoffStopId', label: "Up Dropoff stop", _classes: 'font-weight-bold' },
                     // { key: 'downPickupStopId', label: "Down Pickup stop", _classes: 'font-weight-bold' },
@@ -100,33 +123,54 @@ const dataArray = (location.state && location.state.customers) ? location.state.
                   hover
                   striped
                   // itemsPerPage={10}
-                  clickableRows
-                  onRowClick={(row) => {
-                    console.log('------------row',row)
-                    props.history.push({
-                      pathname: `/passenger/shift/list`,
-                      search: `${row?.passenger?.id}`,
-                      state: row
-                    });
-                  }}
                   // activePage={page}
                   scopedSlots={{
                     'name':
                       (item) => (
                         <td style={{ textTransform: 'capitalize' }}>
+                          {item?.passenger?.name}
+                        </td>
+                      ),
+                      'phone':
+                      (item) => (
+                        <td style={{ textTransform: 'capitalize' }}>
                           {item?.passenger?.phone}
                         </td>
                       ),
-                    'pickup':
+                      'email':
                       (item) => (
                         <td style={{ textTransform: 'capitalize' }}>
-                          {item?.pickup?.name}
+                          {item?.passenger?.email}
                         </td>
                       ),
-                    'dropoff':
+                    'upShift':
                       (item) => (
                         <td style={{ textTransform: 'capitalize' }}>
-                          {item?.dropoff?.name}
+                          {item?.shift_name?.up_shift}
+                        </td>
+                      ),
+                      'downShift':
+                      (item) => (
+                        <td style={{ textTransform: 'capitalize' }}>
+                          {item?.shift_name?.down_shift}
+                        </td>
+                      ),
+                    'plan':
+                      (item) => (
+                        <td style={{ textTransform: 'capitalize' }}>
+                          {item?.plan?.name}
+                        </td>
+                      ),
+                      'status':
+                      (item) => (
+                        <td style={{ textTransform: 'capitalize' }}>
+                          {item?.status === 'Completed' ? 'Paid' : item?.status}
+                        </td>
+                      ),
+                      'created':
+                      (item) => (
+                        <td>
+                            {moment(item.created).format('Do MMM YYYY hh:mm a')}
                         </td>
                       ),
                     // 'upPickupStopId':
@@ -168,18 +212,18 @@ const dataArray = (location.state && location.state.customers) ? location.state.
 function mapDispatchToProps(dispatch) {
   return {
     actions: bindActionCreators({
-      _getShiftDetails: (data) => getShiftDetails(data),
+      _getPassengerDetails: (data) => getPassengerDetails(data),
     }, dispatch)
   }
 }
 
 function mapStateToProps(state) {
   // console.log("==========> User",state);
-  const { shifts, loader } = state;
+  const { passengers, loader } = state;
   return {
-    shiftDetails: shifts.details,
+    passengerDetails: passengers.details,
     isLoading: loader.loading
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Shift);
+export default connect(mapStateToProps, mapDispatchToProps)(Passenger);
